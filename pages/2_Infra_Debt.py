@@ -1,4 +1,4 @@
-"""Page Deal Infra Debt — inputs SPV + offtake + CFADS year-by-year + DSCR + S2 QII."""
+"""Infrastructure Debt deal — SPV + offtake + year-by-year CFADS + DSCR + S2 QII."""
 
 from __future__ import annotations
 
@@ -12,17 +12,18 @@ from src.models.infra_deal import InfraDeal
 from src.utils.presets_loader import get_deal_by_id, load_preset_deals
 from src.utils.ui_common import (
     inject_css,
-    kpi_tile,
+    kpi_row,
+    pillar_line,
     render_alm_banner,
     render_footer,
     safe_fmt,
     section_head,
-    verdict_badge_html,
+    verdict_pill_html,
 )
 
-st.set_page_config(page_title="Capital Lens — Infra Debt", page_icon="🏗️", layout="wide")
+st.set_page_config(page_title="Capital Lens — Infrastructure Debt", layout="wide")
 inject_css()
-st.title("🏗️ Infrastructure Debt Deal")
+st.title("Infrastructure Debt Deal")
 
 alm = render_alm_banner()
 
@@ -36,7 +37,7 @@ preset: InfraDeal = get_deal_by_id(preset_id)
 col_in, col_ratios, col_stress, col_s2 = st.columns([1.2, 1, 1, 1])
 
 with col_in:
-    section_head("Inputs (editable)")
+    section_head("Inputs")
     project_name = st.text_input("Project name", value=preset.spv.project_name)
     sectors = ["Renewable solar", "Renewable wind onshore", "Renewable wind offshore",
                "Renewable hydro", "Data center", "Transport", "Social", "Utility"]
@@ -47,7 +48,7 @@ with col_in:
         "Currency", ["EUR", "USD", "GBP"], index=["EUR", "USD", "GBP"].index(preset.currency)
     )
 
-    st.divider()
+    st.markdown('<div class="section-head">Offtake</div>', unsafe_allow_html=True)
     offtake_choices = ["PPA fix", "PPA indexed", "CfD", "Take-or-pay", "Availability payment", "Merchant"]
     offtake_type = st.selectbox("Offtake type", offtake_choices, index=offtake_choices.index(preset.offtake.offtake_type))
     strike = st.number_input("Strike price / unit revenue", value=float(preset.offtake.strike_price_eur_mwh), min_value=0.0)
@@ -62,7 +63,7 @@ with col_in:
         "Capacity factor (%)", value=float(preset.offtake.capacity_factor), min_value=0.0, max_value=100.0, step=1.0
     )
 
-    st.divider()
+    st.markdown('<div class="section-head">Project</div>', unsafe_allow_html=True)
     capex = st.number_input("Capex total (M)", value=float(preset.project.capex_total_eur_m), min_value=1.0, step=50.0)
     opex = st.number_input("Opex annual (M/y)", value=float(preset.project.opex_annual_eur_m), min_value=0.0, step=1.0)
     hm_freq = st.number_input("Heavy maint frequency (y)", value=int(preset.project.heavy_maint_frequency_years), min_value=0)
@@ -70,7 +71,7 @@ with col_in:
     cod = st.number_input("COD year", value=int(preset.project.cod_year), min_value=2000)
     plife = st.number_input("Project life (y)", value=int(preset.project.project_life_years), min_value=5)
 
-    st.divider()
+    st.markdown('<div class="section-head">Debt</div>', unsafe_allow_html=True)
     debt_amount = st.number_input("Debt amount (M)", value=float(preset.debt.debt_amount_eur_m), min_value=1.0, step=50.0)
     debt_maturity = st.number_input("Debt maturity (y)", value=int(preset.debt.debt_maturity_years), min_value=1)
     debt_profile = st.selectbox(
@@ -85,7 +86,7 @@ with col_in:
     debt_margin = st.number_input("Debt margin (bps)", value=float(preset.debt.debt_margin_bps), min_value=0.0, step=25.0)
     dsra = st.number_input("DSRA (months)", value=float(preset.debt.dsra_months), min_value=0.0)
 
-    st.divider()
+    st.markdown('<div class="section-head">Risk</div>', unsafe_allow_html=True)
     ratings = ["AAA", "AA", "A", "BBB+", "BBB", "BBB-", "BB+", "BB", "BB-", "B+", "B", "B-", "CCC"]
     rating = st.selectbox(
         "Rating estimation", ratings,
@@ -99,7 +100,6 @@ with col_in:
         min_value=0.0, max_value=100.0, step=5.0,
     )
 
-# Compute
 m = compute_infra_metrics(
     capacity_mw=capacity,
     capacity_factor_pct=cap_factor,
@@ -125,38 +125,44 @@ roc = return_on_capital_s2(m.yield_net_pct, shock)
 v = verdict_infra(m, roc, debt_maturity, alm)
 
 with col_ratios:
-    section_head("Project finance ratios")
-    st.markdown(kpi_tile("Min DSCR", safe_fmt(m.min_dscr, "{:.2f}×")), unsafe_allow_html=True)
-    st.markdown(kpi_tile("Avg DSCR", safe_fmt(m.avg_dscr, "{:.2f}×")), unsafe_allow_html=True)
-    st.markdown(kpi_tile("LLCR", safe_fmt(m.llcr, "{:.2f}×")), unsafe_allow_html=True)
-    st.markdown(kpi_tile("PLCR", safe_fmt(m.plcr, "{:.2f}×")), unsafe_allow_html=True)
-    st.markdown(kpi_tile("Tail", f"{m.tail_years:.0f}y"), unsafe_allow_html=True)
-    st.markdown(kpi_tile("All-in yield", f"{m.all_in_yield_pct:.2f}%"), unsafe_allow_html=True)
+    section_head("Project finance")
+    st.markdown("".join([
+        kpi_row("Min DSCR", safe_fmt(m.min_dscr, "{:.2f}×")),
+        kpi_row("Avg DSCR", safe_fmt(m.avg_dscr, "{:.2f}×")),
+        kpi_row("LLCR", safe_fmt(m.llcr, "{:.2f}×")),
+        kpi_row("PLCR", safe_fmt(m.plcr, "{:.2f}×")),
+        kpi_row("Tail", f"{m.tail_years:.0f}y"),
+        kpi_row("All-in yield", f"{m.all_in_yield_pct:.2f}%"),
+    ]), unsafe_allow_html=True)
 
 with col_stress:
     section_head("Stress tests")
-    st.markdown("**Base case**")
-    st.markdown(kpi_tile("Min DSCR base", safe_fmt(m.min_dscr, "{:.2f}×")), unsafe_allow_html=True)
-    st.markdown("**P90 — production −15 %**")
-    st.markdown(kpi_tile("Min DSCR P90", safe_fmt(m.min_dscr_p90, "{:.2f}×")), unsafe_allow_html=True)
-    st.markdown("**Merchant −25 %**")
+    st.markdown("".join([
+        kpi_row("Base", safe_fmt(m.min_dscr, "{:.2f}×")),
+        kpi_row("P90 (production −15%)", safe_fmt(m.min_dscr_p90, "{:.2f}×")),
+    ]), unsafe_allow_html=True)
     if offtake_type == "Merchant":
-        st.markdown(kpi_tile("Min DSCR merch", safe_fmt(m.min_dscr_merch, "{:.2f}×")), unsafe_allow_html=True)
+        st.markdown(kpi_row("Merchant −25%", safe_fmt(m.min_dscr_merch, "{:.2f}×")), unsafe_allow_html=True)
     else:
-        st.caption("Not applicable (offtake not merchant).")
-    st.markdown("**Combined**")
-    st.markdown(kpi_tile("Min DSCR combined", safe_fmt(m.min_dscr_combined, "{:.2f}×")), unsafe_allow_html=True)
+        st.markdown(
+            '<div style="font-size:0.72rem;color:var(--ink-mute);margin:8px 0 4px;letter-spacing:0.04em">Merchant stress n/a — offtake not merchant.</div>',
+            unsafe_allow_html=True,
+        )
+    st.markdown(kpi_row("Combined", safe_fmt(m.min_dscr_combined, "{:.2f}×")), unsafe_allow_html=True)
 
 with col_s2:
     section_head("Solvency II")
-    st.markdown(kpi_tile("Shock Art 176(3)", f"{shock:.1f}%"), unsafe_allow_html=True)
+    rows = [kpi_row("Spread shock — Art 176(3)", f"{shock:.1f}%")]
     if qii_eligible:
-        st.caption(f"QII regime: −{qii_reduction:.0f}% applied")
-    st.markdown(kpi_tile("Expected loss", f"{m.el_annual_pct:.3f}%"), unsafe_allow_html=True)
-    st.markdown(kpi_tile("Yield net of EL", f"{m.yield_net_pct:.2f}%"), unsafe_allow_html=True)
-    st.markdown(kpi_tile("Return on capital S2", f"{roc:.1f}%"), unsafe_allow_html=True)
+        rows.append(kpi_row("QII reduction applied", f"−{qii_reduction:.0f}%"))
+    rows.extend([
+        kpi_row("Expected loss", f"{m.el_annual_pct:.3f}%"),
+        kpi_row("Yield net of EL", f"{m.yield_net_pct:.2f}%"),
+        kpi_row("Return on capital S2", f"{roc:.1f}%", best=True),
+    ])
+    st.markdown("".join(rows), unsafe_allow_html=True)
 
-st.divider()
+st.markdown("")
 section_head("Cashflows year-by-year")
 chart_df = m.cashflows.reset_index().rename(columns={"index": "year"})
 chart_df["debt_service"] = chart_df["debt_principal"] + chart_df["debt_interest"]
@@ -168,7 +174,16 @@ fig = px.bar(
     labels={"value": f"Cashflow ({currency} M)", "year": "Year (from COD)", "variable": ""},
     color_discrete_map={"cfads": "#003781", "debt_service": "#B68C1E"},
 )
-fig.update_layout(legend_title=None, height=380, margin=dict(t=20, b=20))
+fig.update_layout(
+    legend_title=None,
+    height=360,
+    margin=dict(t=10, b=10, l=10, r=10),
+    plot_bgcolor="rgba(0,0,0,0)",
+    paper_bgcolor="rgba(0,0,0,0)",
+    font=dict(family="Public Sans, sans-serif", size=12, color="#1a1a1a"),
+    xaxis=dict(showgrid=False, zeroline=False),
+    yaxis=dict(gridcolor="rgba(0,0,0,0.06)", zeroline=False),
+)
 st.plotly_chart(fig, width="stretch")
 
 with st.expander("Year-by-year detail (CFADS + debt service)"):
@@ -179,23 +194,16 @@ with st.expander("Year-by-year detail (CFADS + debt service)"):
         width="stretch",
     )
 
-st.divider()
+st.markdown("")
 section_head("Verdict — 3 pillars")
-vcols = st.columns(4)
-vcols[0].markdown(
-    f"**Crédit** {verdict_badge_html(v.credit.status)}<br><small>{v.credit.reason or 'min DSCR & LLCR within bounds'}</small>",
+st.markdown(
+    pillar_line("Credit", v.credit.status, v.credit.reason or "Min DSCR and LLCR within bounds.")
+    + pillar_line("Solvency II", v.s2.status, v.s2.reason or "RoC S2 above 35% threshold.")
+    + pillar_line("ALM Mandate Fit", v.alm.status, v.alm.reason or "Duration and liquidity within mandate."),
     unsafe_allow_html=True,
 )
-vcols[1].markdown(
-    f"**Solvency II** {verdict_badge_html(v.s2.status)}<br><small>{v.s2.reason or 'RoC S2 above 35% threshold'}</small>",
-    unsafe_allow_html=True,
-)
-vcols[2].markdown(
-    f"**ALM Mandate Fit** {verdict_badge_html(v.alm.status)}<br><small>{v.alm.reason or 'duration & liquidity within mandate'}</small>",
-    unsafe_allow_html=True,
-)
-vcols[3].markdown(
-    f"**Final** {verdict_badge_html(v.final)}",
+st.markdown(
+    f'<div style="margin-top:16px;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-soft)">Final&nbsp;&nbsp; {verdict_pill_html(v.final)}</div>',
     unsafe_allow_html=True,
 )
 

@@ -1,113 +1,306 @@
-/* AIM Capital Lens — Streamlit custom styling, Allianz palette */
+/* AIM Capital Lens — institutional finance typography & spacing
+   Audience: Allianz Vie credit analyst, presented via screen share.
+   Tone: restrained, editorial. No emoji, no AI-dashboard tropes. */
+
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Spectral:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  --allianz-primary: #003781;
-  --allianz-primary-dark: #002558;
-  --allianz-gold: #B68C1E;
-  --allianz-bg: #FFFFFF;
-  --allianz-text: #1A1A1A;
-  --allianz-text-muted: #595959;
-  --allianz-red: #C0392B;
-  --allianz-orange: #E67E22;
-  --allianz-green: #27AE60;
-  --allianz-input-yellow: #FFF2CC;
-  --allianz-alm-bg: #D5E3F0;
+  /* Allianz primary, expressed in OKLCH for perceptual evenness */
+  --allianz: oklch(0.36 0.16 260);            /* #003781 */
+  --allianz-deep: oklch(0.28 0.14 260);
+  --allianz-soft: oklch(0.95 0.025 260);      /* surface tint */
+  --gold: oklch(0.66 0.13 80);                /* #B68C1E */
+
+  /* Neutrals tinted toward the brand hue (chroma 0.005-0.01) */
+  --ink: oklch(0.18 0.012 260);               /* primary text */
+  --ink-soft: oklch(0.42 0.012 260);          /* secondary text */
+  --ink-mute: oklch(0.62 0.010 260);          /* caption / hint */
+  --rule: oklch(0.90 0.010 260);              /* hairlines */
+  --surface: oklch(0.99 0.005 260);           /* page bg */
+  --surface-2: oklch(0.97 0.008 260);         /* card bg */
+
+  /* Status — muted, not neon */
+  --pass: oklch(0.46 0.10 145);
+  --pass-soft: oklch(0.94 0.04 145);
+  --cond: oklch(0.58 0.13 65);
+  --cond-soft: oklch(0.94 0.05 75);
+  --reject: oklch(0.50 0.16 25);
+  --reject-soft: oklch(0.94 0.05 25);
+
+  /* 4-pt spacing scale */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
 }
 
-/* App-wide tweaks */
-.stApp {
-  background-color: var(--allianz-bg);
+/* ---------- Streamlit chrome overrides ---------- */
+.stApp,
+.stApp [data-testid="stAppViewContainer"],
+.stApp [data-testid="stHeader"] {
+  background-color: var(--surface);
 }
 
-/* ALM banner */
+[data-testid="stSidebar"] {
+  background: var(--surface-2);
+  border-right: 1px solid var(--rule);
+}
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] ul {
+  padding-top: var(--s-3);
+}
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] a span {
+  font-family: 'Public Sans', system-ui, sans-serif !important;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+}
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] span {
+  color: var(--allianz);
+  font-weight: 600;
+}
+
+/* ---------- Typography ---------- */
+html, body, .stApp, [data-testid="stAppViewContainer"] {
+  font-family: 'Public Sans', system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;     /* tabular lining figures */
+}
+
+h1, .stApp h1 {
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(1.85rem, 1.5rem + 1.4vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: var(--allianz);
+  margin: 0 0 var(--s-2) 0;
+}
+
+h2, .stApp h2 {
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 500;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: var(--s-6) 0 var(--s-3) 0;
+}
+
+h3, h4, h5, .stApp h3, .stApp h4, .stApp h5 {
+  font-family: 'Public Sans', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+}
+
+p, label, .stMarkdown, .stMarkdown p {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+small, caption, .stCaption { color: var(--ink-mute); font-size: 0.78rem; letter-spacing: 0.01em; }
+
+code, pre, [data-testid="stDataFrame"], .mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+
+/* ---------- ALM mandate banner ---------- */
 .alm-banner {
-  background: linear-gradient(90deg, var(--allianz-primary) 0%, var(--allianz-primary-dark) 100%);
+  background: var(--allianz);
   color: white;
-  padding: 12px 20px;
-  border-radius: 6px;
-  margin-bottom: 18px;
-  border-left: 6px solid var(--allianz-gold);
+  padding: var(--s-4) var(--s-5);
+  margin-bottom: var(--s-5);
+  border-radius: 2px;
 }
 .alm-banner .alm-title {
-  font-weight: 700;
-  font-size: 0.9rem;
-  letter-spacing: 0.4px;
+  font-family: 'Public Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--allianz-gold);
-  margin-bottom: 6px;
+  color: var(--gold);
+  margin-bottom: var(--s-3);
 }
 .alm-banner .alm-row {
-  display: flex;
-  gap: 28px;
-  font-size: 0.95rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--s-5);
+  align-items: start;
 }
-.alm-banner .alm-row span b {
+.alm-banner .alm-row > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.95rem;
   color: white;
 }
-.alm-banner .alm-row span small {
-  display: block;
-  color: #cbd5e1;
-  font-size: 0.72rem;
-  margin-top: 1px;
+.alm-banner .alm-row > span b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
-
-/* Section headers */
-.section-head {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: var(--allianz-primary);
-  border-bottom: 2px solid var(--allianz-primary);
-  padding-bottom: 4px;
-  margin-bottom: 12px;
-  margin-top: 6px;
-}
-
-/* KPI tiles */
-.kpi-tile {
-  background: white;
-  border: 1px solid #d6deea;
-  border-left: 4px solid var(--allianz-primary);
-  border-radius: 4px;
-  padding: 10px 14px;
-  margin-bottom: 8px;
-}
-.kpi-tile .kpi-label {
+.alm-banner .alm-row > span small {
+  color: rgba(255, 255, 255, 0.65);
   font-size: 0.7rem;
-  color: var(--allianz-text-muted);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.kpi-tile .kpi-value {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--allianz-primary);
-}
-.kpi-tile.kpi-best {
-  border-left-color: var(--allianz-gold);
-  background-color: #FFF8E5;
 }
 
-/* Verdict badge */
-.verdict-badge {
+/* ---------- Section heads ---------- */
+.section-head {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: var(--s-2);
+  margin-top: var(--s-4);
+  margin-bottom: var(--s-4);
+}
+
+/* ---------- KPI rows — flat editorial, NOT cards with left-stripes ---------- */
+.kpi-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--rule);
+}
+.kpi-row:last-child { border-bottom: none; }
+.kpi-row .kpi-label {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.01em;
+}
+.kpi-row .kpi-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.kpi-row.kpi-best .kpi-value {
+  color: var(--allianz);
+  font-weight: 600;
+}
+.kpi-row.kpi-best .kpi-label::after {
+  content: '· best';
+  margin-left: var(--s-2);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* ---------- Verdict pills — uppercase plate, no icon ---------- */
+.verdict-pill {
   display: inline-block;
-  padding: 4px 14px;
-  border-radius: 14px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  border: 1px solid transparent;
 }
-.verdict-pass    { background-color: #DFF5E5; color: var(--allianz-green); }
-.verdict-cond    { background-color: #FFF0DA; color: var(--allianz-orange); }
-.verdict-reject  { background-color: #FBE3E0; color: var(--allianz-red); }
+.verdict-pass    { background: var(--pass-soft);    color: var(--pass);    border-color: color-mix(in oklch, var(--pass) 25%, transparent); }
+.verdict-cond    { background: var(--cond-soft);    color: var(--cond);    border-color: color-mix(in oklch, var(--cond) 25%, transparent); }
+.verdict-reject  { background: var(--reject-soft);  color: var(--reject);  border-color: color-mix(in oklch, var(--reject) 25%, transparent); }
 
-/* Footer disclaimer */
-.footer-disclaimer {
-  border-top: 1px solid #e2e8f0;
-  margin-top: 32px;
-  padding-top: 12px;
-  color: var(--allianz-text-muted);
-  font-size: 0.74rem;
-  line-height: 1.5;
+.pillar-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--rule);
 }
+.pillar-line:last-child { border-bottom: none; }
+.pillar-line .pillar-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--ink);
+  min-width: 150px;
+}
+.pillar-line .pillar-reason {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+/* ---------- Buttons & inputs ---------- */
+.stButton > button, .stDownloadButton > button {
+  font-family: 'Public Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  background: var(--allianz);
+  color: white;
+  border: none;
+  border-radius: 2px;
+  padding: 10px 22px;
+  transition: background 160ms ease-out;
+}
+.stButton > button:hover, .stDownloadButton > button:hover {
+  background: var(--allianz-deep);
+  color: white;
+}
+
+input, textarea, select,
+[data-baseweb="input"] input,
+[data-baseweb="select"] > div {
+  font-family: 'Public Sans', sans-serif !important;
+  font-size: 0.9rem !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* DataFrame styling */
+[data-testid="stDataFrame"] {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+}
+
+/* Plotly chart container */
+.js-plotly-plot { background: transparent !important; }
+
+/* ---------- Footer ---------- */
+.footer-disclaimer {
+  border-top: 1px solid var(--rule);
+  margin-top: var(--s-7);
+  padding-top: var(--s-4);
+  color: var(--ink-mute);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+.footer-disclaimer b { color: var(--ink-soft); font-weight: 600; }
+
+/* ---------- Deal card on home ---------- */
+.deal-card {
+  padding: var(--s-5) 0;
+  border-top: 2px solid var(--allianz);
+  margin-top: var(--s-4);
+}
+.deal-card .deal-meta {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: var(--s-2);
+}
+.deal-card h4 {
+  font-family: 'Spectral', serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--s-3) 0;
+  color: var(--ink);
+}
+
+/* Hide Streamlit default branding for a cleaner editorial look */
+[data-testid="stToolbar"] { right: 1rem; opacity: 0.4; }
+footer { visibility: hidden; }
+[data-testid="stDecoration"] { display: none; }

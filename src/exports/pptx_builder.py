@@ -90,9 +90,8 @@ def _verdict_color(status: str) -> RGBColor:
 
 
 def _add_verdict_pill(slide, left, top, status: str):
-    icon = {"PASS": "✅", "PROCEED": "✅", "CONDITIONS": "⚠", "REJECT": "✖"}.get(status, "•")
-    txt = f"  {icon}  {status}  "
-    pill = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(2.0), Inches(0.45))
+    txt = f"   {status}   "
+    pill = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, left, top, Inches(2.0), Inches(0.45))
     pill.fill.solid()
     pill.fill.fore_color.rgb = _verdict_color(status)
     pill.line.fill.background()
@@ -319,7 +318,7 @@ def _slide_stress(prs, dl: DLDeal, infra: InfraDeal):
                 cell.fill.solid()
                 cell.fill.fore_color.rgb = ALLIANZ_PRIMARY
     _add_text(slide, Inches(0.7), Inches(6.3), Inches(12), Inches(0.4),
-              "Legend  ✓ pass · ⚠ tight (close to floor) · ✗ breach",
+              "Legend — PASS clears floor · TIGHT within 0.1× of floor · BREACH below floor",
               size=11, color=RGBColor(0x59, 0x59, 0x59))
 
 
@@ -327,10 +326,10 @@ def _icon(value: float, pass_threshold: float, warn_threshold: float) -> str:
     if value is None or value != value:
         return "—"
     if value >= pass_threshold:
-        return f"✓  {value:.2f}×"
+        return f"PASS — {value:.2f}×"
     if value >= warn_threshold:
-        return f"⚠  {value:.2f}×"
-    return f"✗  {value:.2f}×"
+        return f"TIGHT — {value:.2f}×"
+    return f"BREACH — {value:.2f}×"
 
 
 def _slide_s2_decomp(prs, dl: DLDeal, infra: InfraDeal):
@@ -413,9 +412,8 @@ def _slide_recommendation(prs, dl: DLDeal, infra: InfraDeal, alm: ALMMandate):
             ("ALM Mandate Fit", v.alm.status, v.alm.reason or "duration & liquidity within mandate"),
         ]
         for i, (pillar, status, reason) in enumerate(bullets):
-            icon = {"PASS": "✅", "CONDITIONS": "⚠", "REJECT": "✖"}.get(status, "•")
             _add_text(slide, x, Inches(1.7 + 0.7 * i), Inches(6.0), Inches(0.4),
-                      f"{icon}  {pillar}: {status}", size=13, bold=True,
+                      f"{pillar} — {status}", size=13, bold=True,
                       color=_verdict_color(status))
             _add_text(slide, x, Inches(1.95 + 0.7 * i), Inches(6.0), Inches(0.4),
                       reason, size=11, color=TEXT)

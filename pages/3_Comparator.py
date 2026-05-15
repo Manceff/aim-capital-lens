@@ -1,4 +1,4 @@
-"""Page Comparator — side-by-side DL vs Infra + verdict 3 piliers."""
+"""Comparator — side-by-side DL vs Infra Debt + 3-pillar verdict."""
 
 from __future__ import annotations
 
@@ -11,16 +11,18 @@ from src.calculations.verdict_engine import verdict_dl, verdict_infra
 from src.utils.presets_loader import get_deal_by_id, load_alm_mandate, load_preset_deals
 from src.utils.ui_common import (
     inject_css,
+    kpi_row,
+    pillar_line,
     render_alm_banner,
     render_footer,
     safe_fmt,
     section_head,
-    verdict_badge_html,
+    verdict_pill_html,
 )
 
-st.set_page_config(page_title="Capital Lens — Comparator", page_icon="⚖️", layout="wide")
+st.set_page_config(page_title="Capital Lens — Comparator", layout="wide")
 inject_css()
-st.title("⚖️ Side-by-side Comparator")
+st.title("Side-by-side Comparator")
 
 alm = render_alm_banner()
 
@@ -32,7 +34,6 @@ def _compute_dl_view(deal_id: str):
     roc = return_on_capital_s2(m.yield_net, shock)
     v = verdict_dl(m, roc, d.loan.maturity_years, alm)
     return {
-        "deal": d,
         "label": d.label,
         "currency": d.currency,
         "rows": [
@@ -64,7 +65,6 @@ def _compute_infra_view(deal_id: str):
     roc = return_on_capital_s2(m.yield_net_pct, shock)
     v = verdict_infra(m, roc, d.debt.debt_maturity_years, alm)
     return {
-        "deal": d,
         "label": d.label,
         "currency": d.currency,
         "rows": [
@@ -79,122 +79,91 @@ def _compute_infra_view(deal_id: str):
             ("Return on capital S2", safe_fmt(roc, "{:.1f}%")),
             ("Duration / tenor", f"{d.debt.debt_maturity_years}y"),
             ("Min DSCR P90 (stress)", safe_fmt(m.min_dscr_p90, "{:.2f}×")),
-            ("Tail (project life − debt mat.)", f"{m.tail_years:.0f}y"),
+            ("Tail (project − debt maturity)", f"{m.tail_years:.0f}y"),
         ],
         "roc_s2": roc,
         "verdict": v,
     }
 
 
-# Select two deals to compare
 all_deals = load_preset_deals()
 dl_ids = [d.id for d in all_deals if d.type == "DL"]
 infra_ids = [d.id for d in all_deals if d.type == "INFRA"]
 
 col_sel_a, col_sel_b = st.columns(2)
 with col_sel_a:
-    a_id = st.selectbox(
-        "Left deal (DL)", options=dl_ids,
-        format_func=lambda x: get_deal_by_id(x).label,
-    )
+    a_id = st.selectbox("Left — Direct Lending", options=dl_ids,
+                        format_func=lambda x: get_deal_by_id(x).label)
 with col_sel_b:
-    b_id = st.selectbox(
-        "Right deal (Infra Debt)", options=infra_ids,
-        format_func=lambda x: get_deal_by_id(x).label,
-    )
+    b_id = st.selectbox("Right — Infrastructure Debt", options=infra_ids,
+                        format_func=lambda x: get_deal_by_id(x).label)
 
 A = _compute_dl_view(a_id)
 B = _compute_infra_view(b_id)
 
-# Build comparator rows. Some metrics differ in name between DL and Infra so we align by index.
-metric_labels = [
-    "Credit ratio 1", "Credit ratio 2", "Credit ratio 3", "Credit ratio 4",
-    "All-in yield", "Expected loss", "Yield net", "Spread shock S2",
-    "Return on capital S2", "Duration", "Stress headline", "Tail / combined stress",
-]
-
-st.markdown("---")
+st.markdown("")
 
 col_a, col_b = st.columns(2)
 with col_a:
-    section_head(f"Deal A — {A['label']}")
+    section_head(A["label"])
     st.caption(f"Currency: {A['currency']}")
-    for label, value in A["rows"]:
-        bold = "**" if label == "Return on capital S2" else ""
-        marker = "  ◀ best" if (label == "Return on capital S2" and A["roc_s2"] > B["roc_s2"]) else ""
-        st.markdown(f"{bold}{label}{bold} : {bold}{value}{bold}{marker}")
+    html = "".join(
+        kpi_row(label, value, best=(label == "Return on capital S2" and A["roc_s2"] > B["roc_s2"]))
+        for label, value in A["rows"]
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
 with col_b:
-    section_head(f"Deal B — {B['label']}")
+    section_head(B["label"])
     st.caption(f"Currency: {B['currency']}")
-    for label, value in B["rows"]:
-        bold = "**" if label == "Return on capital S2" else ""
-        marker = "  ◀ best" if (label == "Return on capital S2" and B["roc_s2"] > A["roc_s2"]) else ""
-        st.markdown(f"{bold}{label}{bold} : {bold}{value}{bold}{marker}")
+    html = "".join(
+        kpi_row(label, value, best=(label == "Return on capital S2" and B["roc_s2"] > A["roc_s2"]))
+        for label, value in B["rows"]
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
-st.markdown("---")
+st.markdown("")
 
 section_head("Verdict — 3 pillars")
 vcol_a, vcol_b = st.columns(2)
 with vcol_a:
-    st.markdown(f"##### Deal A — {A['label']}")
+    st.markdown(f"##### {A['label']}")
     st.markdown(
-        f"- **Crédit** {verdict_badge_html(A['verdict'].credit.status)} "
-        f"<small>{A['verdict'].credit.reason or 'all credit thresholds met'}</small>",
+        pillar_line("Credit", A["verdict"].credit.status, A["verdict"].credit.reason or "All credit thresholds met.")
+        + pillar_line("Solvency II", A["verdict"].s2.status, A["verdict"].s2.reason or "RoC S2 above 35%.")
+        + pillar_line("ALM Mandate Fit", A["verdict"].alm.status, A["verdict"].alm.reason or "Within ALM duration and liquidity."),
         unsafe_allow_html=True,
     )
     st.markdown(
-        f"- **Solvency II** {verdict_badge_html(A['verdict'].s2.status)} "
-        f"<small>{A['verdict'].s2.reason or 'RoC S2 ≥ 35%'}</small>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f"- **ALM Mandate Fit** {verdict_badge_html(A['verdict'].alm.status)} "
-        f"<small>{A['verdict'].alm.reason or 'within ALM duration & liquidity'}</small>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f"#### Final: {verdict_badge_html(A['verdict'].final)}",
+        f'<div style="margin-top:14px;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-soft)">Final&nbsp;&nbsp; {verdict_pill_html(A["verdict"].final)}</div>',
         unsafe_allow_html=True,
     )
 
 with vcol_b:
-    st.markdown(f"##### Deal B — {B['label']}")
+    st.markdown(f"##### {B['label']}")
     st.markdown(
-        f"- **Crédit** {verdict_badge_html(B['verdict'].credit.status)} "
-        f"<small>{B['verdict'].credit.reason or 'min DSCR & LLCR within bounds'}</small>",
+        pillar_line("Credit", B["verdict"].credit.status, B["verdict"].credit.reason or "Min DSCR and LLCR within bounds.")
+        + pillar_line("Solvency II", B["verdict"].s2.status, B["verdict"].s2.reason or "RoC S2 above 35%.")
+        + pillar_line("ALM Mandate Fit", B["verdict"].alm.status, B["verdict"].alm.reason or "Within ALM duration and liquidity."),
         unsafe_allow_html=True,
     )
     st.markdown(
-        f"- **Solvency II** {verdict_badge_html(B['verdict'].s2.status)} "
-        f"<small>{B['verdict'].s2.reason or 'RoC S2 ≥ 35%'}</small>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f"- **ALM Mandate Fit** {verdict_badge_html(B['verdict'].alm.status)} "
-        f"<small>{B['verdict'].alm.reason or 'within ALM duration & liquidity'}</small>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f"#### Final: {verdict_badge_html(B['verdict'].final)}",
+        f'<div style="margin-top:14px;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-soft)">Final&nbsp;&nbsp; {verdict_pill_html(B["verdict"].final)}</div>',
         unsafe_allow_html=True,
     )
 
-st.markdown("---")
+st.markdown("")
 section_head("Recommendation")
-best_roc = "Deal A" if A["roc_s2"] > B["roc_s2"] else "Deal B"
+best_roc_label = A["label"] if A["roc_s2"] > B["roc_s2"] else B["label"]
 best_value = max(A["roc_s2"], B["roc_s2"])
 st.markdown(
-    f"- **Best return on S2 capital**: {best_roc} at {best_value:.1f}%.\n"
-    f"- **Deal A — {A['verdict'].final}**: "
-    f"{'all 3 pillars green' if A['verdict'].final == 'PROCEED' else 'see pillar reasons above'}.\n"
-    f"- **Deal B — {B['verdict'].final}**: "
-    f"{'all 3 pillars green' if B['verdict'].final == 'PROCEED' else 'see pillar reasons above'}.\n"
-    f"- Where a deal triggers an **ALM REJECT**, the analyst escalates to the Risk & ALM Committee "
-    f"(scope ALM, not Alt Investments)."
+    f"- Best return on Solvency II capital: **{best_roc_label}** at **{best_value:.1f}%**.  \n"
+    f"- {A['label']} — final **{A['verdict'].final}**.  \n"
+    f"- {B['label']} — final **{B['verdict'].final}**.  \n"
+    f"- Where a deal triggers an ALM REJECT, the analyst escalates to the Risk &amp; ALM Committee — "
+    f"the duration and liquidity envelope sits in their scope, not in Alt Investments."
 )
 
-# Persist for exports
 st.session_state["comparator_state"] = {
     "deal_a_id": a_id,
     "deal_b_id": b_id,

@@ -132,10 +132,10 @@ flag live in the UI to explore counterfactuals.
 aim-capital-lens/
 ├── streamlit_app.py                # Home (3 preloaded deals)
 ├── pages/
-│   ├── 1_📊_Deal_DL.py             # Direct Lending deal page
-│   ├── 2_🏗️_Deal_Infra.py          # Infra Debt deal page
-│   ├── 3_⚖️_Comparator.py          # Side-by-side + 3-pillar verdict
-│   └── 4_📥_Exports.py             # Excel + PPT buttons
+│   ├── 1_Direct_Lending.py         # Direct Lending deal page
+│   ├── 2_Infra_Debt.py             # Infrastructure Debt deal page
+│   ├── 3_Comparator.py             # Side-by-side + 3-pillar verdict
+│   └── 4_Exports.py                # Excel + PPT buttons
 ├── src/
 │   ├── models/                     # Pydantic v2 schemas
 │   ├── calculations/               # All metric engines

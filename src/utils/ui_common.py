@@ -1,11 +1,10 @@
-"""Streamlit UI helpers shared across pages — ALM banner, palette, footer."""
+"""Streamlit UI helpers — institutional editorial style. No emoji."""
 
 from __future__ import annotations
 
 import json
 import math
 from pathlib import Path
-from typing import Any
 
 import streamlit as st
 
@@ -37,13 +36,10 @@ def render_alm_banner(alm: ALMMandate | None = None) -> ALMMandate:
         <div class="alm-banner">
             <div class="alm-title">{alm.display_label}</div>
             <div class="alm-row">
-                <span><b>Duration target</b> {alm.alm_duration_min_years:.0f}–{alm.alm_duration_max_years:.0f}y
-                    <small>life liabilities</small></span>
-                <span><b>5y liquidity floor</b> {alm.alm_liquidity_floor_5y_pct:.0f}%
-                    <small>balance sheet</small></span>
-                <span><b>S2 ratio target</b> ≥ {alm.s2_ratio_minimum_pct:.0f}%
-                    <small>Comex Allianz Vie</small></span>
-                <span><b>Owner</b> {alm.mandate_owner}</span>
+                <span><small>Duration target</small><b>{alm.alm_duration_min_years:.0f}–{alm.alm_duration_max_years:.0f}y</b><small>life liabilities</small></span>
+                <span><small>5y liquidity floor</small><b>{alm.alm_liquidity_floor_5y_pct:.0f}%</b><small>balance sheet</small></span>
+                <span><small>S2 ratio target</small><b>≥ {alm.s2_ratio_minimum_pct:.0f}%</b><small>Comex Allianz Vie</small></span>
+                <span><small>Owner</small><b>{alm.mandate_owner}</b></span>
             </div>
         </div>
         """,
@@ -56,34 +52,50 @@ def render_footer() -> None:
     st.markdown(
         """
         <div class="footer-disclaimer">
-        <b>AIM Capital Lens</b> — projet personnel post-entretien. Aucune donnée propriétaire Allianz.
-        Calculs S2 basés sur Article 176(3) Règlement délégué (UE) 2015/35 (table Milliman 2019) et régime QII Articles 164a / 164b.
-        Author Mancef Ferrah · M2 Finance Tech & Data, Université Paris 1.
+        <b>AIM Capital Lens</b> — personal post-interview project. No proprietary Allianz data.
+        Solvency II calculations based on Article 176(3) of Règlement délégué (UE) 2015/35
+        (Milliman 2019 calibration) and the QII regime under Articles 164a / 164b.
+        Author Mancef Ferrah — M2 Finance Tech &amp; Data, Université Paris 1.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
 
-def verdict_badge_html(status: str) -> str:
+def verdict_pill_html(status: str) -> str:
+    """Uppercase status pill, no emoji."""
     cls = {
         "PASS": "verdict-pass",
         "PROCEED": "verdict-pass",
         "CONDITIONS": "verdict-cond",
         "REJECT": "verdict-reject",
     }.get(status, "verdict-cond")
-    icon = {"PASS": "✅", "PROCEED": "✅", "CONDITIONS": "⚠️", "REJECT": "❌"}.get(status, "•")
-    return f'<span class="verdict-badge {cls}">{icon} {status}</span>'
+    return f'<span class="verdict-pill {cls}">{status}</span>'
+
+
+# Back-compat alias for any caller still using the old name
+verdict_badge_html = verdict_pill_html
+
+
+def kpi_row(label: str, value: str, *, best: bool = False) -> str:
+    """Flat KPI row — label left, value right, hairline underneath. No left-stripe."""
+    cls = "kpi-row kpi-best" if best else "kpi-row"
+    return f'<div class="{cls}"><div class="kpi-label">{label}</div><div class="kpi-value">{value}</div></div>'
 
 
 def kpi_tile(label: str, value: str, best: bool = False) -> str:
-    cls = "kpi-tile kpi-best" if best else "kpi-tile"
-    return f"""
-    <div class="{cls}">
-        <div class="kpi-label">{label}</div>
-        <div class="kpi-value">{value}</div>
-    </div>
-    """
+    """Back-compat shim that now renders the flat editorial row."""
+    return kpi_row(label, value, best=best)
+
+
+def pillar_line(name: str, status: str, reason: str | None) -> str:
+    return (
+        f'<div class="pillar-line">'
+        f'  <div class="pillar-name">{name}</div>'
+        f'  {verdict_pill_html(status)}'
+        f'  <div class="pillar-reason">{reason or ""}</div>'
+        f'</div>'
+    )
 
 
 def section_head(label: str) -> None:
