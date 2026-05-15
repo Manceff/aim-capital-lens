@@ -1,0 +1,10 @@
+# ALM Mandate Constraints — fixed exogenously by Risk & ALM Committee (Allianz Vie).
+# Read-only inputs for Capital Lens operational view.
+# Source: ALM mandate framing (life insurance liabilities duration target, S2 ratio target).
+
+alm_duration_min_years: 8
+alm_duration_max_years: 15
+alm_liquidity_floor_5y_pct: 30   # % of balance sheet expected liquid within 5 years
+s2_ratio_minimum_pct: 200        # Comex Allianz Vie target floor
+mandate_owner: "Risk & ALM Committee — Allianz Vie"
+display_label: "ALM Mandate Constraints — set by Risk & ALM Committee · Not editable in operational view"

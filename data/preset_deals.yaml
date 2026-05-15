@@ -1,0 +1,129 @@
+# 3 preset deals — illustrative, no Allianz proprietary data.
+# Amounts are scalars in the deal's local currency (label only). No FX conversion.
+
+deals:
+  # ============================================================
+  # Deal A — Unitranche LBO SaaS B2B EU (Direct Lending)
+  # ============================================================
+  - id: "deal_a_dl_saas"
+    type: "DL"
+    label: "Deal A — Unitranche LBO SaaS B2B EU"
+    currency: "GBP"
+    borrower:
+      name: "Aurora SaaS Holdings"
+      sector: "SaaS"
+      ebitda: 80.0
+      ebitda_growth: 12.0
+      ebitda_margin: 35.0
+      capex_maintenance: 4.0
+      fcf_conversion: 70.0
+      arr_share: 85.0
+      top10_clients: 25.0
+      sponsor_name: "Top-tier PE Fund"
+      sponsor_tier: "Top-tier"
+    loan:
+      loan_amount: 440.0
+      tranche_type: "Unitranche"
+      base_rate_type: "EURIBOR 3M"
+      base_rate_level: 3.5
+      margin_bps: 625
+      oid_pct: 1.5
+      upfront_pct: 1.0
+      floor_pct: 0.0
+      maturity_years: 7
+      profile: "Bullet"
+      rcf_amount: 0.0
+    covenants:
+      cov_net_lev_cap: 7.0
+      cov_ic_min: 1.5
+      cov_fccr_min: 1.2
+      cov_lite: false
+      dividend_basket_eur_m: 25.0
+    risk:
+      rating_estim: "B+"
+      pd_annual: 2.5
+      lgd: 40.0
+
+  # ============================================================
+  # Deal B — Infra Debt offshore wind UK CfD (proxy East Anglia THREE)
+  # ============================================================
+  - id: "deal_b_infra_offshore"
+    type: "INFRA"
+    label: "Deal B — Infra Debt offshore wind UK (CfD)"
+    currency: "GBP"
+    spv:
+      project_name: "East Anglia THREE proxy"
+      sector: "Renewable wind offshore"
+      country: "GB"
+      sponsor: "SSE Renewables / Equinor"
+    offtake:
+      offtake_type: "CfD"
+      strike_price_eur_mwh: 75.0
+      indexation: "CPI"
+      cpi_pct: 2.0
+      contract_duration_years: 15
+      capacity_mw: 1400.0
+      capacity_factor: 50.0
+    project:
+      capex_total_eur_m: 4000.0
+      opex_annual_eur_m: 80.0
+      heavy_maint_frequency_years: 5
+      heavy_maint_amount_eur_m: 40.0
+      cod_year: 2027
+      project_life_years: 25
+    debt:
+      debt_amount_eur_m: 2800.0
+      debt_maturity_years: 18
+      debt_profile: "Amortizing sculpté"
+      debt_base_rate_type: "EURIBOR 3M"
+      debt_base_rate_level: 3.5
+      debt_margin_bps: 250
+      dsra_months: 6
+    risk:
+      rating_estim: "BBB"
+      pd_annual: 0.20
+      lgd: 25.0
+      qii_eligible: true
+      qii_spread_reduction: 40.0
+
+  # ============================================================
+  # Deal C — Infra Debt data center hyperscale US take-or-pay Microsoft
+  # ============================================================
+  - id: "deal_c_infra_datacenter"
+    type: "INFRA"
+    label: "Deal C — Infra Debt data center hyperscale US"
+    currency: "USD"
+    spv:
+      project_name: "DigitalBridge hyperscale DC"
+      sector: "Data center"
+      country: "US"
+      sponsor: "DigitalBridge"
+    offtake:
+      offtake_type: "Take-or-pay"
+      strike_price_eur_mwh: 95.0   # power-equivalent unit for revenue calc (€/MWh proxy)
+      indexation: "Formula"
+      cpi_pct: 2.0                  # 2% escalator
+      contract_duration_years: 12
+      capacity_mw: 500.0            # IT load equivalent
+      capacity_factor: 85.0
+    project:
+      capex_total_eur_m: 2000.0
+      opex_annual_eur_m: 40.0
+      heavy_maint_frequency_years: 7
+      heavy_maint_amount_eur_m: 30.0
+      cod_year: 2026
+      project_life_years: 20
+    debt:
+      debt_amount_eur_m: 1300.0
+      debt_maturity_years: 15
+      debt_profile: "Amortizing sculpté"
+      debt_base_rate_type: "SOFR 3M"
+      debt_base_rate_level: 4.3
+      debt_margin_bps: 250
+      dsra_months: 6
+    risk:
+      rating_estim: "BBB-"
+      pd_annual: 0.30
+      lgd: 25.0
+      qii_eligible: true
+      qii_spread_reduction: 30.0

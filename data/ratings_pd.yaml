@@ -1,0 +1,35 @@
+# Typical 1-year annual probability of default by rating bucket (corporate, Moody's / S&P blended)
+# Source: industry consensus, used as auto-suggested PD prior — user can override in UI.
+
+pd_annual_pct:
+  AAA: 0.01
+  AA: 0.03
+  A: 0.06
+  BBB: 0.20
+  "BBB+": 0.15
+  "BBB-": 0.30
+  BB: 1.00
+  "BB+": 0.70
+  "BB-": 1.50
+  B: 3.50
+  "B+": 2.50
+  "B-": 5.00
+  CCC: 12.00
+
+# Typical LGD by tranche / asset class (override-able in UI)
+lgd_pct_by_tranche:
+  RCF: 35
+  "1L Term Loan": 35
+  Unitranche: 40
+  "2L": 60
+  Mezzanine: 75
+
+lgd_pct_by_infra_sector:
+  "Renewable solar": 20
+  "Renewable wind onshore": 20
+  "Renewable wind offshore": 25
+  "Renewable hydro": 20
+  "Data center": 25
+  Transport: 30
+  Social: 20
+  Utility: 20

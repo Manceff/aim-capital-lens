@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+.pytest_cache/
+.ipynb_checkpoints/
+.idea/
+.vscode/
+exports/*.xlsx
+exports/*.pptx
+!exports/.gitkeep
+.env
+.streamlit/secrets.toml

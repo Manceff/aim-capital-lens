@@ -1,0 +1,14 @@
+{
+  "primary": "#003781",
+  "primary_dark": "#002558",
+  "accent_gold": "#B68C1E",
+  "background": "#FFFFFF",
+  "text_primary": "#1A1A1A",
+  "text_secondary": "#595959",
+  "alert_red": "#C0392B",
+  "warning_orange": "#E67E22",
+  "ok_green": "#27AE60",
+  "input_yellow": "#FFF2CC",
+  "alm_blue_bg": "#D5E3F0",
+  "table_header_text": "#FFFFFF"
+}

@@ -1,0 +1,113 @@
+/* AIM Capital Lens — Streamlit custom styling, Allianz palette */
+
+:root {
+  --allianz-primary: #003781;
+  --allianz-primary-dark: #002558;
+  --allianz-gold: #B68C1E;
+  --allianz-bg: #FFFFFF;
+  --allianz-text: #1A1A1A;
+  --allianz-text-muted: #595959;
+  --allianz-red: #C0392B;
+  --allianz-orange: #E67E22;
+  --allianz-green: #27AE60;
+  --allianz-input-yellow: #FFF2CC;
+  --allianz-alm-bg: #D5E3F0;
+}
+
+/* App-wide tweaks */
+.stApp {
+  background-color: var(--allianz-bg);
+}
+
+/* ALM banner */
+.alm-banner {
+  background: linear-gradient(90deg, var(--allianz-primary) 0%, var(--allianz-primary-dark) 100%);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  margin-bottom: 18px;
+  border-left: 6px solid var(--allianz-gold);
+}
+.alm-banner .alm-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--allianz-gold);
+  margin-bottom: 6px;
+}
+.alm-banner .alm-row {
+  display: flex;
+  gap: 28px;
+  font-size: 0.95rem;
+}
+.alm-banner .alm-row span b {
+  color: white;
+}
+.alm-banner .alm-row span small {
+  display: block;
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  margin-top: 1px;
+}
+
+/* Section headers */
+.section-head {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--allianz-primary);
+  border-bottom: 2px solid var(--allianz-primary);
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+  margin-top: 6px;
+}
+
+/* KPI tiles */
+.kpi-tile {
+  background: white;
+  border: 1px solid #d6deea;
+  border-left: 4px solid var(--allianz-primary);
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+}
+.kpi-tile .kpi-label {
+  font-size: 0.7rem;
+  color: var(--allianz-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.kpi-tile .kpi-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--allianz-primary);
+}
+.kpi-tile.kpi-best {
+  border-left-color: var(--allianz-gold);
+  background-color: #FFF8E5;
+}
+
+/* Verdict badge */
+.verdict-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+.verdict-pass    { background-color: #DFF5E5; color: var(--allianz-green); }
+.verdict-cond    { background-color: #FFF0DA; color: var(--allianz-orange); }
+.verdict-reject  { background-color: #FBE3E0; color: var(--allianz-red); }
+
+/* Footer disclaimer */
+.footer-disclaimer {
+  border-top: 1px solid #e2e8f0;
+  margin-top: 32px;
+  padding-top: 12px;
+  color: var(--allianz-text-muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}

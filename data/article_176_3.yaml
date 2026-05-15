@@ -1,0 +1,67 @@
+# Solvency II — Article 176(3) Spread Risk Module
+# Règlement délégué (UE) 2015/35, Article 176(3). Stressi (spread shock) en % de l'exposition
+# par notation Crédit Quality Step et maturité.
+# Table : Milliman 2019 — calibration EIOPA standard formula.
+#
+# Rows : rating (S&P-style). For B+/B-/CCC fallback see s2_capital.py mapping.
+# Columns : maturity bucket in years (3, 5, 7, 10, 15, 20). Linear interpolation between buckets,
+# clamped at extremes.
+
+ratings:
+  AAA:
+    3: 2.7
+    5: 4.5
+    7: 5.5
+    10: 7.0
+    15: 9.5
+    20: 12.0
+  AA:
+    3: 3.3
+    5: 5.5
+    7: 6.7
+    10: 8.5
+    15: 10.9
+    20: 13.4
+  A:
+    3: 4.2
+    5: 7.0
+    7: 8.4
+    10: 10.5
+    15: 13.0
+    20: 15.5
+  BBB:
+    3: 7.5
+    5: 12.5
+    7: 15.5
+    10: 20.0
+    15: 25.0
+    20: 30.0
+  BB:
+    3: 13.5
+    5: 22.5
+    7: 27.5
+    10: 35.0
+    15: 44.0
+    20: 46.5
+  B:
+    3: 22.5
+    5: 37.5
+    7: 45.9
+    10: 58.5
+    15: 61.0
+    20: 63.5
+
+# Notch mapping for ratings outside the 6 main rows.
+# Conservative choice — collapse to nearest worse row (no interpolation between rating notches).
+notch_mapping:
+  "AA+": "AA"
+  "AA-": "A"
+  "A+": "A"
+  "A-": "BBB"
+  "BBB+": "BBB"
+  "BBB-": "BB"
+  "BB+": "BB"
+  "BB-": "B"
+  "B+": "B"
+  "B-": "B"
+  "CCC": "B"   # spec table tops at B; CCC mapped conservatively onto B row
