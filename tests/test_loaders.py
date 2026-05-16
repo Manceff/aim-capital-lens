@@ -54,11 +54,16 @@ def test_ratings_pd_loads():
     assert pd["lgd_pct_by_tranche"]["Unitranche"] == 40
 
 
-def test_preset_deals_load_three():
+def test_preset_deals_load_four_templates():
     deals = load_preset_deals()
-    assert len(deals) == 3
+    assert len(deals) == 4
     ids = {d.id for d in deals}
-    assert ids == {"deal_a_dl_saas", "deal_b_infra_offshore", "deal_c_infra_datacenter"}
+    assert ids == {
+        "deal_a_dl_saas",
+        "deal_b_infra_offshore",
+        "deal_c_infra_datacenter",
+        "deal_custom_dl",
+    }
 
 
 def test_deal_a_is_dl():

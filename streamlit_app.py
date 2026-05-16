@@ -1,14 +1,13 @@
-"""AIM Capital Lens — entry point (Home).
+"""AIM Capital Lens — Home.
 
-Cross-class private debt comparator for Allianz Vie balance sheet.
-Direct Lending × Infra Debt × Solvency II return on capital.
+Pick a template to start analyzing a private debt deal. The chosen template is
+written to st.session_state and the user lands on the Analyzer page.
 """
 
 from __future__ import annotations
 
 import streamlit as st
 
-from src.utils.presets_loader import load_preset_deals
 from src.utils.ui_common import inject_css, render_alm_banner, render_footer, section_head
 
 st.set_page_config(
@@ -21,59 +20,83 @@ inject_css()
 
 st.title("AIM Capital Lens")
 st.markdown(
-    "*Cross-class private debt comparator for Allianz Vie — "
-    "Direct Lending × Infrastructure Debt × Solvency II return on capital.*"
+    "*Single-deal credit analyzer for Allianz Vie balance sheet — "
+    "Direct Lending and Infrastructure Debt, with Solvency II capital lens.*"
 )
 
 render_alm_banner()
 
 st.markdown(
     """
-    A unified read on two private-debt opportunities: credit ratios on one side,
-    project-finance coverage on the other, Solvency II capital intensity on both.
-    The verdict layer makes the analyst's call (Credit · S2) explicit, and flags
-    where the ALM mandate envelope — owned upstream by the Risk &amp; ALM Committee —
-    binds.
+    Pick a template below to load typical inputs for a deal type, then refine
+    the numbers on the Analyzer page. The analysis reads the metrics in plain
+    English (verdict, three pillars, narrative interpretation) so you can
+    focus on the call rather than on the dashboard.
     """
 )
 
-section_head("Preloaded deals")
+section_head("Templates")
 
-deals = load_preset_deals()
-cols = st.columns(3)
-for col, deal in zip(cols, deals):
-    with col:
+TEMPLATES = [
+    {
+        "id": "deal_a_dl_saas",
+        "kicker": "Direct Lending",
+        "name": "Unitranche LBO — SaaS / TMT",
+        "body": (
+            "Sponsor-backed unitranche, EBITDA-positive scale-up borrower. "
+            "EURIBOR + 600–700 bps area, 7-year bullet, covenant package. "
+            "Calibrated to a B+ rated profile."
+        ),
+    },
+    {
+        "id": "deal_b_infra_offshore",
+        "kicker": "Infrastructure Debt",
+        "name": "Renewable — offshore wind (CfD)",
+        "body": (
+            "Long-dated project finance debt, sculpted amortisation, "
+            "UK-style CfD with CPI indexation. BBB rating, QII regime "
+            "applied at the standard reduction."
+        ),
+    },
+    {
+        "id": "deal_c_infra_datacenter",
+        "kicker": "Infrastructure Debt",
+        "name": "Data center — hyperscale take-or-pay",
+        "body": (
+            "Hyperscaler-backed take-or-pay contract with escalator, "
+            "amortising debt across 15 years. BBB- rating, QII applied."
+        ),
+    },
+    {
+        "id": "deal_custom_dl",
+        "kicker": "Custom",
+        "name": "Blank Direct Lending deal",
+        "body": (
+            "Start from a generic mid-cap unitranche stub and fill in the "
+            "borrower, loan, and risk inputs yourself."
+        ),
+    },
+]
+
+cols = st.columns(2)
+for idx, tpl in enumerate(TEMPLATES):
+    with cols[idx % 2]:
         st.markdown(
-            f'<div class="deal-card">'
-            f'<div class="deal-meta">{deal.type} · {deal.currency} · {deal.id}</div>'
-            f'<h4>{deal.label}</h4>'
-            f'</div>',
+            f"""
+            <div class="deal-card">
+                <div class="deal-meta">{tpl['kicker']}</div>
+                <h4>{tpl['name']}</h4>
+                <p style="color:var(--ink-soft); font-size:0.92rem; line-height:1.55;">
+                    {tpl['body']}
+                </p>
+            </div>
+            """,
             unsafe_allow_html=True,
         )
-        if deal.type == "DL":
-            st.markdown(
-                f"- Borrower: **{deal.borrower.name}** ({deal.borrower.sector})  \n"
-                f"- EBITDA {deal.borrower.ebitda:.0f}M · margin {deal.borrower.ebitda_margin:.0f}%  \n"
-                f"- Loan {deal.loan.loan_amount:.0f}M {deal.loan.tranche_type}  \n"
-                f"- {deal.loan.base_rate_type} + {deal.loan.margin_bps:.0f} bps  \n"
-                f"- Tenor {deal.loan.maturity_years:.0f}y {deal.loan.profile}  \n"
-                f"- Rating {deal.risk.rating_estim}"
-            )
-        else:
-            qii = (
-                f"QII −{int(deal.risk.qii_spread_reduction)}%"
-                if deal.risk.qii_eligible
-                else "non-QII"
-            )
-            st.markdown(
-                f"- Project: **{deal.spv.project_name}** ({deal.spv.sector})  \n"
-                f"- Offtake {deal.offtake.offtake_type} · {deal.offtake.contract_duration_years:.0f}y  \n"
-                f"- Capacity {deal.offtake.capacity_mw:.0f} MW · CF {deal.offtake.capacity_factor:.0f}%  \n"
-                f"- Debt {deal.debt.debt_amount_eur_m:.0f}M · {deal.debt.debt_maturity_years}y {deal.debt.debt_profile}  \n"
-                f"- Rating {deal.risk.rating_estim} ({qii})"
-            )
+        if st.button("Open in analyzer", key=f"open_{tpl['id']}"):
+            st.session_state["selected_template_id"] = tpl["id"]
+            st.switch_page("pages/1_Analyzer.py")
 
-st.markdown("")
 section_head("Methodology")
 st.markdown(
     """
@@ -81,9 +104,10 @@ st.markdown(
       Milliman 2019 calibration. Linear interpolation between maturity buckets.
     - **QII regime** — Articles 164a / 164b — spread shock reduction applied to
       qualifying infrastructure debt.
-    - **3-pillar verdict** — Credit · Solvency II · ALM Mandate Fit. The tool flags
-      where the operational analyst's call (credit + S2) sits, and where the ALM
-      Committee's constraints (duration / liquidity / S2 ratio target) take over.
+    - **3-pillar verdict** — Credit · Solvency II · ALM Mandate Fit. The tool
+      flags where the operational analyst's call (credit + S2) sits, and where
+      the ALM Committee's constraints (duration / liquidity / S2 ratio target)
+      take over.
     """
 )
 

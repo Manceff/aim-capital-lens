@@ -127,3 +127,45 @@ deals:
       lgd: 25.0
       qii_eligible: true
       qii_spread_reduction: 30.0
+
+  # ============================================================
+  # Custom — empty Direct Lending stub for blank-slate analysis
+  # ============================================================
+  - id: "deal_custom_dl"
+    type: "DL"
+    label: "Custom Direct Lending"
+    currency: "EUR"
+    borrower:
+      name: "New borrower"
+      sector: "Other"
+      ebitda: 50.0
+      ebitda_growth: 5.0
+      ebitda_margin: 25.0
+      capex_maintenance: 2.0
+      fcf_conversion: 60.0
+      arr_share: 0.0
+      top10_clients: 30.0
+      sponsor_name: ""
+      sponsor_tier: "Mid-tier"
+    loan:
+      loan_amount: 250.0
+      tranche_type: "Unitranche"
+      base_rate_type: "EURIBOR 3M"
+      base_rate_level: 3.5
+      margin_bps: 500
+      oid_pct: 1.0
+      upfront_pct: 1.0
+      floor_pct: 0.0
+      maturity_years: 7
+      profile: "Bullet"
+      rcf_amount: 0.0
+    covenants:
+      cov_net_lev_cap: 6.5
+      cov_ic_min: 1.5
+      cov_fccr_min: 1.2
+      cov_lite: false
+      dividend_basket_eur_m: 10.0
+    risk:
+      rating_estim: "B"
+      pd_annual: 3.5
+      lgd: 40.0
